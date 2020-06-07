@@ -3,40 +3,21 @@
 # Exercise 2.4
 
 import csv, sys, locale
-from pprint import pprint
+from fileparse import parse_csv
 
 locale.setlocale(locale.LC_ALL, '')
 
 def read_portfolio(filename):
     'Create list of dicts from csv'
 
-    portfolio = []
-
-    with open(filename, 'rt') as f:
-        rows = csv.reader(f)
-        headers = next(rows)
-        for i, row in enumerate(rows):
-            record = dict(zip(headers, row))
-            try:
-                holding = {'name':record['name'], 'shares':int(record['shares']), 'price':float(record['price'])}
-            except ValueError:
-                # holding = {'name':row[0], 'shares':0, 'price':float(row[2])}
-                print(f'Row {i}: Bad row: {row}')
-            
-            portfolio.append(holding)
+    portfolio = parse_csv(filename, select=['name', 'shares', 'price'], types=[str, int, float])
 
     return portfolio
 
 def read_prices(filename):
     'Create dict from csv'
     
-    prices = {}
-
-    with open(filename, 'rt') as f:
-        rows = csv.reader(f)
-        for row in rows:
-            if row:
-                prices[row[0]] = float(row[1])
+    prices = { name: price for name, price in parse_csv(filename, types=[str, float], has_headers=False) }
 
     return prices
 
