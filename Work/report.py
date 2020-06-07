@@ -2,10 +2,8 @@
 #
 # Exercise 2.4
 
-import locale, stock, tableformat
+import stock, tableformat
 from fileparse import parse_csv
-
-locale.setlocale(locale.LC_ALL, '')
 
 def read_portfolio(filename):
     'Create list of stocks from csv'
@@ -66,25 +64,21 @@ def print_report(reportdata, formatter):
     formatter.headings(['Name','Shares','Price','Change'])
 
     for name, shares, price, change in reportdata:
-        # price = locale.currency(price)
-        # rowdata = [ name, str(shares), f'{locale.currency(price):>10s}', f'{change:0.2f}']
         rowdata = [ name, str(shares), f'{price:>0.2f}', f'{change:0.2f}']
         formatter.row(rowdata)
 
-    print('\n')
-    
-def portfolio_report(portfolio_filename="Data/portfolio.csv", prices_filename="Data/prices.csv"):
-    reportdata = make_report_data(read_portfolio(portfolio_filename), read_prices(prices_filename))
-    formatter = tableformat.HTMLTableFormatter()
-    print(f'{portfolio_filename:*^43s}')
+def portfolio_report(portfile, pricefile, fmt='txt'):
+    reportdata = make_report_data(read_portfolio(portfile), read_prices(pricefile))
+    formatter = tableformat.create_formatter(fmt)
     print_report(reportdata, formatter)
 
 def main(argv):
-    if len(argv) > 1:
-        for file in argv[1:]:
-            portfolio_report(file)
+    if len(argv) < 3 or len(argv) > 4:
+        print(f'Usage: {argv[0]} portfile pricefile [output_format]')
+    elif len(argv) == 3:
+        portfolio_report(argv[1], argv[2])
     else:
-        portfolio_report()
+        portfolio_report(argv[1], argv[2], argv[3])
 
 if __name__ == '__main__':
     import sys
