@@ -2,7 +2,7 @@
 #
 # Exercise 2.4
 
-import csv, sys, locale
+import csv, locale
 from fileparse import parse_csv
 
 locale.setlocale(locale.LC_ALL, '')
@@ -75,8 +75,13 @@ def portfolio_report(portfolio_filename="Data/portfolio.csv", prices_filename="D
     print(f'{portfolio_filename:*^43s}')
     print_report(report)
 
-if len(sys.argv) > 1:
-    for file in sys.argv[1:]:
-        portfolio_report(file)
-else:
-    portfolio_report()
+def main(argv):
+    if len(argv) > 1:
+        for file in argv[1:]:
+            portfolio_report(file)
+    else:
+        portfolio_report()
+
+if __name__ == '__main__':
+    import sys
+    main(sys.argv)

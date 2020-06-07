@@ -2,28 +2,25 @@
 #
 # Exercise 1.27
 
-import csv, sys
+import csv
+from report import read_portfolio
 
 def portfolio_cost(filename):
     'Get total portfolio cost of a csv'
 
-    total = 0
-
-    with open(filename, 'rt') as f:
-        rows = csv.reader(f)
-        next(rows)
-        for row in rows:
-            try:
-                total += int(row[1]) * float(row[2])
-            except ValueError:
-                print('Something is not valid in row: ', row)
+    total = sum([s['price']*s['shares'] for s in read_portfolio(filename)])
 
     return total
 
-if len(sys.argv) == 2:
-    filename = sys.argv[1]
-else:
-    filename = 'Data/portfolio.csv'
+def main(argv):
+    if len(argv) == 2:
+        filename = argv[1]
+    else:
+        filename = 'Data/portfolio.csv'
 
-cost = portfolio_cost(filename)
-print('Total cost', cost)
+    print('Total cost', portfolio_cost(filename))
+
+
+if __name__ == '__main__':
+    import sys
+    main(sys.argv)
