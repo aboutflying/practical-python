@@ -1,3 +1,101 @@
 # report.py
 #
 # Exercise 2.4
+
+import csv, sys, locale
+from pprint import pprint
+
+locale.setlocale(locale.LC_ALL, '')
+
+def read_portfolio(filename):
+    'Create list of dicts from csv'
+
+    portfolio = []
+
+    with open(filename, 'rt') as f:
+        rows = csv.reader(f)
+        headers = next(rows)
+        for i, row in enumerate(rows):
+            record = dict(zip(headers, row))
+            try:
+                holding = {'name':record['name'], 'shares':int(record['shares']), 'price':float(record['price'])}
+            except ValueError:
+                # holding = {'name':row[0], 'shares':0, 'price':float(row[2])}
+                print(f'Row {i}: Bad row: {row}')
+            
+            portfolio.append(holding)
+
+    return portfolio
+
+def read_prices(filename):
+    'Create dict from csv'
+    
+    prices = {}
+
+    with open(filename, 'rt') as f:
+        rows = csv.reader(f)
+        for row in rows:
+            if row:
+                prices[row[0]] = float(row[1])
+
+    return prices
+
+def portfolio_cost(portfolio):
+    'Get total portfolio cost'
+
+    cost = 0
+
+    for holding in portfolio:
+        cost += holding['shares'] * holding['price']
+
+    return cost  
+
+def current_value(portfolio, prices):
+    'Get current value of portfolio'
+
+    current_value = 0
+
+    for holding in portfolio:
+        if holding['name'] in prices:
+            current_value += holding['shares'] * prices[holding['name']]
+
+    return current_value
+
+def make_report(portfolio, prices):
+    'Generate report'
+
+    report = []
+
+    for holding in portfolio:
+        if holding['name'] in prices:
+            report.append((
+                holding['name'], 
+                holding['shares'], 
+                prices[holding['name']], 
+                prices[holding['name']] - holding['price']
+            ))
+
+    return report
+
+def print_report(report):
+    headers = ('Name','Shares','Price','Change')
+
+    print('%10s %10s %10s %10s'% headers)
+    print(('-' * 10 + ' ') * len(headers))
+
+    for name, shares, price, change in report:
+        price = locale.currency(price)
+        print(f'{name:>10s} {shares:>10d} {price:>10s} {change:>10,.2f}')
+
+    print('\n')
+    
+def portfolio_report(portfolio_filename="Data/portfolio.csv", prices_filename="Data/prices.csv"):
+    report = make_report(read_portfolio(portfolio_filename), read_prices(prices_filename))
+    print(f'{portfolio_filename:*^43s}')
+    print_report(report)
+
+if len(sys.argv) > 1:
+    for file in sys.argv[1:]:
+        portfolio_report(file)
+else:
+    portfolio_report()
