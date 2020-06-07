@@ -4,15 +4,18 @@
 
 import csv
 
-def parse_csv(lines, select=None, types=None, has_headers=True, delimiter=',', silence_errors=False):
+def parse_csv(obj, select=None, types=None, has_headers=True, delimiter=',', silence_errors=False):
     '''
-    Parse iterable as csv into a list of records
+    Parse iterable non-string object as csv into a list of records
     '''
+
+    if isinstance(obj, str):
+        raise RuntimeError("obj must be an interable non-string object")
 
     if select and has_headers == False:
         raise RuntimeError("select argument requires column headers")
 
-    rows = csv.reader(lines, delimiter=delimiter)
+    rows = csv.reader(obj, delimiter=delimiter)
 
     if has_headers:
         # Read the file headers
